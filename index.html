@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataLab — Curso de Análisis de Datos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1f2d47;
+    --accent:#00d4ff;--accent2:#7c3aed;--accent3:#10b981;--warn:#f59e0b;
+    --danger:#ef4444;--text:#e2e8f0;--text-muted:#64748b;--text-dim:#334155;
+    --green:#10b981;--mono:'Space Mono',monospace;--sans:'Sora',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  #app{position:relative;z-index:1;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid var(--border);background:rgba(10,14,26,0.9);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+  .logo{font-family:var(--mono);font-size:20px;color:var(--accent);letter-spacing:-1px;}
+  .logo span{color:var(--text-muted);}
+  .header-right{display:flex;align-items:center;gap:16px;}
+  .xp-badge{font-family:var(--mono);font-size:13px;color:var(--warn);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);padding:6px 14px;border-radius:20px;}
+  .level-badge{font-family:var(--mono);font-size:13px;color:var(--accent);background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);padding:6px 14px;border-radius:20px;}
+  main{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 65px);}
+  aside{border-right:1px solid var(--border);padding:24px 0;background:rgba(17,24,39,0.5);overflow-y:auto;max-height:calc(100vh - 65px);position:sticky;top:65px;}
+  .sidebar-section{padding:0 20px;margin-bottom:28px;}
+  .sidebar-label{font-family:var(--mono);font-size:10px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;padding:0 4px;}
+  .module-btn{width:100%;text-align:left;background:none;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;margin-bottom:4px;display:flex;align-items:center;gap:10px;color:var(--text-muted);font-family:var(--sans);font-size:13.5px;}
+  .module-btn:hover{background:var(--surface2);color:var(--text);}
+  .module-btn.active{background:rgba(0,212,255,0.1);color:var(--accent);border-left:2px solid var(--accent);}
+  .mod-icon{font-size:16px;flex-shrink:0;}
+  .mod-badge{margin-left:auto;font-family:var(--mono);font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2);}
+  .mod-badge.job{background:rgba(124,58,237,0.15);color:#a78bfa;border-color:rgba(124,58,237,0.3);}
+  .progress-wrap{padding:0 20px;margin-bottom:24px;}
+  .progress-info{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:8px;}
+  .progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 0.5s ease;}
+  .content{padding:32px 40px;max-width:900px;}
+  .lesson-header{margin-bottom:28px;}
+  .lesson-tag{font-family:var(--mono);font-size:11px;color:var(--accent2);background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);padding:4px 10px;border-radius:4px;letter-spacing:1px;display:inline-block;margin-bottom:12px;}
+  .lesson-title{font-size:28px;font-weight:700;letter-spacing:-0.5px;line-height:1.2;margin-bottom:10px;}
+  .lesson-subtitle{font-size:15px;color:var(--text-muted);line-height:1.6;}
+  .concept-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;}
+  .concept-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);}
+  .concept-card h3{font-size:16px;font-weight:600;margin-bottom:10px;}
+  .concept-card p{font-size:14px;color:var(--text-muted);line-height:1.7;}
+  .concept-card code{font-family:var(--mono);font-size:13px;background:rgba(0,212,255,0.08);color:var(--accent);padding:2px 6px;border-radius:4px;}
+  .code-block{background:#0d1526;border:1px solid var(--border);border-radius:10px;margin:16px 0;overflow:hidden;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02);}
+  .code-lang{font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;}
+  .code-body{padding:20px;font-family:var(--mono);font-size:13px;line-height:1.8;color:#94a3b8;overflow-x:auto;}
+  .code-body .kw{color:#c084fc;}.code-body .fn{color:#60a5fa;}.code-body .st{color:#86efac;}.code-body .cm{color:#475569;font-style:italic;}.code-body .nm{color:#fbbf24;}
+  .challenge-banner{background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(0,212,255,0.08));border:1px solid rgba(124,58,237,0.3);border-radius:12px;padding:20px 24px;margin:28px 0 20px;display:flex;align-items:center;gap:16px;}
+  .challenge-icon{font-size:36px;flex-shrink:0;}
+  .challenge-text h3{font-size:16px;font-weight:700;color:#a78bfa;margin-bottom:4px;}
+  .challenge-text p{font-size:13px;color:var(--text-muted);line-height:1.5;}
+  .task-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;transition:border-color 0.2s;}
+  .task-card.active-task{border-color:rgba(0,212,255,0.4);}
+  .task-header{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+  .task-num{font-family:var(--mono);font-size:11px;color:var(--text-muted);background:var(--surface2);padding:3px 8px;border-radius:4px;flex-shrink:0;}
+  .task-title{font-size:14px;font-weight:600;flex:1;}
+  .task-body{padding:0 20px 20px;display:none;}
+  .task-body.open{display:block;}
+  .task-scenario{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13.5px;color:#fcd34d;line-height:1.6;}
+  .task-scenario strong{color:var(--warn);display:block;margin-bottom:4px;font-size:11px;letter-spacing:1px;font-family:var(--mono);}
+  .task-question{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px;}
+  textarea.code-input{width:100%;background:#0d1526;border:1px solid var(--border);border-radius:8px;padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--text);resize:vertical;min-height:100px;outline:none;transition:border-color 0.2s;line-height:1.7;}
+  textarea.code-input:focus{border-color:rgba(0,212,255,0.5);}
+  .submit-row{display:flex;gap:10px;margin-top:12px;align-items:center;}
+  .btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-family:var(--sans);font-size:13.5px;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+  .btn-primary{background:var(--accent);color:#0a0e1a;}
+  .btn-primary:hover{background:#33dcff;transform:translateY(-1px);}
+  .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--text-muted);color:var(--text);}
+  .ai-feedback{margin-top:16px;background:var(--surface2);border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+  .ai-feedback-header{padding:12px 16px;background:rgba(0,212,255,0.05);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-size:12px;color:var(--accent);font-family:var(--mono);letter-spacing:0.5px;}
+  .ai-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.8);}}
+  .ai-feedback-body{padding:16px;font-size:14px;line-height:1.7;color:var(--text);}
+  .feedback-score{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .score-num{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent3);}
+  .score-label{font-size:13px;color:var(--text-muted);}
+  .feedback-section{margin-bottom:12px;}
+  .feedback-section-title{font-size:11px;font-family:var(--mono);letter-spacing:1px;color:var(--text-muted);margin-bottom:6px;}
+  .feedback-ok{color:var(--green);}.feedback-warn{color:var(--warn);}.feedback-error{color:var(--danger);}
+  .loading-wrap{display:flex;align-items:center;gap:10px;padding:16px;color:var(--text-muted);font-size:13px;}
+  .loading-dots{display:flex;gap:4px;}
+  .loading-dots span{width:5px;height:5px;background:var(--accent);border-radius:50%;animation:bounce 1.2s infinite;}
+  .loading-dots span:nth-child(2){animation-delay:0.2s;}.loading-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes bounce{0%,100%{transform:translateY(0);opacity:0.4;}50%{transform:translateY(-5px);opacity:1;}}
+  .data-table-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:8px;}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;}
+  th{background:var(--surface2);color:var(--accent);padding:10px 14px;text-align:left;font-size:11px;letter-spacing:0.5px;border-bottom:1px solid var(--border);}
+  td{padding:8px 14px;border-bottom:1px solid rgba(31,45,71,0.5);color:var(--text-muted);}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,0.02);color:var(--text);}
+  .quiz-option{width:100%;text-align:left;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:13px 16px;cursor:pointer;margin-bottom:8px;font-family:var(--sans);font-size:13.5px;color:var(--text);transition:all 0.2s;display:flex;align-items:center;gap:12px;}
+  .quiz-option:hover{border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.05);}
+  .quiz-option.correct{border-color:var(--green);background:rgba(16,185,129,0.08);color:var(--green);}
+  .quiz-option.wrong{border-color:var(--danger);background:rgba(239,68,68,0.08);color:var(--danger);}
+  .option-letter{font-family:var(--mono);font-size:11px;width:22px;height:22px;border:1px solid currentColor;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.6;}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto;}
+  .tab-btn{padding:10px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-family:var(--sans);font-size:13.5px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-pane{display:none;}.tab-pane.active{display:block;}
+  .highlight-box{background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:8px;padding:16px 18px;margin:16px 0;font-size:13.5px;line-height:1.7;color:var(--text-muted);}
+  .highlight-box strong{color:var(--accent);}
+  .xp-toast{position:fixed;top:80px;right:24px;background:var(--surface);border:1px solid var(--green);border-radius:10px;padding:14px 20px;font-family:var(--mono);font-size:15px;color:var(--green);z-index:999;transform:translateX(120%);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);display:flex;align-items:center;gap:10px;box-shadow:0 4px 24px rgba(16,185,129,0.2);}
+  .xp-toast.show{transform:translateX(0);}
+  @media(max-width:768px){main{grid-template-columns:1fr;}aside{display:none;}.content{padding:24px 20px;}header{padding:14px 20px;}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="logo">DATA<span>LAB</span> <span style="font-size:12px;color:var(--text-dim)">// Google DA Track</span></div>
+  <div class="header-right">
+    <div class="xp-badge">⚡ <span id="xp-display">0</span> XP</div>
+    <div class="level-badge">LVL <span id="level-display">1</span></div>
+  </div>
+</header>
+<main>
+<aside>
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span style="font-size:12px;color:var(--text-muted)">Progreso del curso</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--accent)" id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Módulos</div>
+    <button class="module-btn active" onclick="loadModule(0)"><span class="mod-icon">📊</span>Fundamentos DA<span class="mod-badge">INTRO</span></button>
+    <button class="module-btn" onclick="loadModule(1)"><span class="mod-icon">🧹</span>Limpieza de Datos<span class="mod-badge job">TRABAJO</span></button>
+    <button class="module-btn" onclick="loadModule(2)"><span class="mod-icon">🔍</span>SQL Queries<span class="mod-badge job">TRABAJO</span></button>
+    <button class="module-btn" onclick="loadModule(3)"><span class="mod-icon">📈</span>Visualización<span class="mod-badge job">TRABAJO</span></button>
+    <button class="module-btn" onclick="loadModule(4)"><span class="mod-icon">🎯</span>Caso Final<span class="mod-badge" style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3)">RETO</span></button>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Herramientas</div>
+    <button class="module-btn" onclick="loadModule(5)" style="font-size:12.5px"><span class="mod-icon">🤖</span>Tutor IA</button>
+    <button class="module-btn" onclick="loadModule(6)" style="font-size:12.5px"><span class="mod-icon">📋</span>Cheat Sheet SQL</button>
+  </div>
+</aside>
+<div class="content" id="main-content"></div>
+</main>
+<div class="xp-toast" id="xp-toast"><span>✨</span><span id="xp-toast-text">+50 XP</span></div>
+</div>
+
+<script>
+var state={xp:0,level:1,completedTasks:new Set(),totalTasks:12};
+
+function updateXP(n){
+  state.xp+=n;
+  document.getElementById('xp-display').textContent=state.xp;
+  if(state.xp>=state.level*100){state.level++;document.getElementById('level-display').textContent=state.level;}
+  showXPToast('+'+n+' XP');
+  var pct=Math.round((state.completedTasks.size/state.totalTasks)*100);
+  document.getElementById('progress-pct').textContent=pct+'%';
+  document.getElementById('progress-fill').style.width=pct+'%';
+}
+
+function showXPToast(t){
+  var el=document.getElementById('xp-toast');
+  document.getElementById('xp-toast-text').textContent=t;
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},2500);
+}
+
+async function getAIFeedback(taskId,userAnswer,taskContext){
+  var feedbackEl=document.getElementById('feedback-'+taskId);
+  if(!feedbackEl)return;
+  feedbackEl.innerHTML='<div class="loading-wrap"><div class="loading-dots"><span></span><span></span><span></span></div><span>Analizando como Senior Data Analyst...</span></div>';
+  feedbackEl.style.display='block';
+
+  var sys='Eres un Senior Data Analyst de Google evaluando a un analista junior. Responde SOLO en JSON sin markdown ni backticks:\n{"score":<0-100>,"rating":"<Excelente|Bien|Parcial|Incorrecto>","correct_aspects":["..."],"improvements":["..."],"senior_tip":"consejo profesional","google_context":"uso en empresa real"}';
+  var usr='TAREA: '+taskContext+'\nRESPUESTA: '+userAnswer+'\nEvalúa como entrevista o tarea real. Responde en español.';
+
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:[{role:'user',content:usr}]})});
+    var d=await r.json();
+    var raw=d.content.map(function(b){return b.text||'';}).join('');
+    raw=raw.replace(/```json|```/g,'').trim();
+    var p;
+    try{p=JSON.parse(raw);}catch(e){p=null;}
+    if(!p){
+      feedbackEl.innerHTML='<div class="ai-feedback"><div class="ai-feedback-header"><div class="ai-dot"></div> FEEDBACK IA</div><div class="ai-feedback-body">'+raw+'</div></div>';
+      return;
+    }
+    var sc=p.score>=80?'var(--green)':p.score>=50?'var(--warn)':'var(--danger)';
+    var okList=(p.correct_aspects||[]).map(function(c){return '<div class="feedback-ok">✓ '+c+'</div>';}).join('');
+    var impList=(p.improvements||[]).map(function(i){return '<div class="feedback-warn">→ '+i+'</div>';}).join('');
+    feedbackEl.innerHTML='<div class="ai-feedback"><div class="ai-feedback-header"><div class="ai-dot"></div> EVALUACIÓN — SENIOR ANALYST</div><div class="ai-feedback-body"><div class="feedback-score"><div class="score-num" style="color:'+sc+'">'+p.score+'</div><div><div style="font-weight:600;font-size:16px">'+p.rating+'</div><div class="score-label">puntuación de 100</div></div></div>'+(okList?'<div class="feedback-section"><div class="feedback-section-title">LO QUE HICISTE BIEN</div>'+okList+'</div>':'')+(impList?'<div class="feedback-section"><div class="feedback-section-title">ÁREAS DE MEJORA</div>'+impList+'</div>':'')+(p.senior_tip?'<div class="feedback-section"><div class="feedback-section-title">💡 CONSEJO SENIOR</div><div style="color:#e2e8f0;font-size:13.5px;line-height:1.6">'+p.senior_tip+'</div></div>':'')+(p.google_context?'<div class="feedback-section"><div class="feedback-section-title">🏢 EN EL MUNDO REAL</div><div style="color:var(--text-muted);font-size:13px;line-height:1.6">'+p.google_context+'</div></div>':'')+'</div></div>';
+    if(p.score>=60&&!state.completedTasks.has(taskId)){state.completedTasks.add(taskId);updateXP(p.score>=80?50:30);}
+  }catch(e){
+    feedbackEl.innerHTML='<div style="padding:16px;color:var(--danger);font-size:13px">Error al conectar con la IA.</div>';
+  }
+}
+
+var chatHistory=[];
+async function sendChat(msg){
+  var chatBody=document.getElementById('chat-body');
+  if(!chatBody||!msg.trim())return;
+  chatHistory.push({role:'user',content:msg});
+  chatBody.innerHTML+='<div style="margin-bottom:12px;text-align:right"><span style="background:rgba(0,212,255,0.1);color:var(--accent);padding:8px 14px;border-radius:10px 10px 2px 10px;display:inline-block;font-size:13.5px;max-width:80%;text-align:left">'+msg+'</span></div>';
+  chatBody.scrollTop=chatBody.scrollHeight;
+  var tid='think-'+Date.now();
+  chatBody.innerHTML+='<div id="'+tid+'"><div class="loading-wrap" style="padding:8px 0"><div class="loading-dots"><span></span><span></span><span></span></div><span style="font-size:12px">Pensando...</span></div></div>';
+  chatBody.scrollTop=chatBody.scrollHeight;
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:'Eres un tutor experto en análisis de datos del curso Google Data Analytics. Eres directo, práctico y usas ejemplos del mundo real. Responde en español de forma concisa y clara.',messages:chatHistory})});
+    var d=await r.json();
+    var reply=d.content.map(function(b){return b.text||'';}).join('');
+    chatHistory.push({role:'assistant',content:reply});
+    document.getElementById(tid).outerHTML='<div style="margin-bottom:12px"><div style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px 10px 10px 2px;display:inline-block;font-size:13.5px;max-width:85%;line-height:1.6;white-space:pre-wrap">'+reply+'</div></div>';
+    chatBody.scrollTop=chatBody.scrollHeight;
+  }catch(e){document.getElementById(tid).outerHTML='<div style="color:var(--danger);font-size:13px;padding:8px 0">Error de conexión</div>';}
+}
+
+function toggleTask(id){
+  var body=document.getElementById('task-body-'+id);
+  if(!body)return;
+  body.classList.toggle('open');
+  var card=document.getElementById('task-card-'+id);
+  if(card)card.classList.toggle('active-task');
+}
+
+function checkQuiz(btn,correct){
+  var opts=btn.parentElement.querySelectorAll('.quiz-option');
+  opts.forEach(function(o){o.disabled=true;});
+  if(correct){btn.classList.add('correct');if(!state.completedTasks.has('q'+btn.dataset.id)){state.completedTasks.add('q'+btn.dataset.id);updateXP(25);}}
+  else{btn.classList.add('wrong');opts.forEach(function(o){if(o.dataset.correct==='true')o.classList.add('correct');});}
+}
+
+function submitTask(id,ctx){
+  var inp=document.getElementById('input-'+id);
+  if(!inp)return;
+  var v=inp.value.trim();
+  if(!v){alert('Escribe tu respuesta antes de enviar');return;}
+  getAIFeedback(id,v,ctx);
+}
+
+function switchTab(e,tabId){
+  var container=e.target.closest('.tabs').parentElement;
+  container.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  container.querySelectorAll('.tab-pane').forEach(function(p){p.classList.remove('active');});
+  e.target.classList.add('active');
+  var pane=document.getElementById('tab-'+tabId);
+  if(pane)pane.classList.add('active');
+}
+
+var modules=[
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">MÓDULO 01 // FUNDAMENTOS</div><div class="lesson-title">¿Qué hace un Data Analyst?</div><div class="lesson-subtitle">Comprende el rol, las herramientas y el proceso de análisis de datos en un entorno empresarial real.</div></div>
+<div class="tabs"><button class="tab-btn active" onclick="switchTab(event,'theory')">📖 Teoría</button><button class="tab-btn" onclick="switchTab(event,'practice')">⚡ Práctica</button><button class="tab-btn" onclick="switchTab(event,'quiz')">🎯 Quiz</button></div>
+<div class="tab-pane active" id="tab-theory">
+<div class="concept-card"><h3>🎯 El ciclo de análisis de datos</h3><p>Google define 6 fases: <strong>Preguntar → Preparar → Procesar → Analizar → Compartir → Actuar</strong>. Cada fase tiene herramientas y entregables específicos que se esperan en un entorno profesional.</p></div>
+<div class="concept-card"><h3>🛠️ Stack de herramientas en la industria</h3><p><strong>SQL</strong> — consultar bases de datos (BigQuery, PostgreSQL)<br><strong>Spreadsheets</strong> — análisis rápido, tablas pivote<br><strong>Tableau / Looker</strong> — visualización y dashboards<br><strong>R / Python</strong> — análisis estadístico avanzado</p></div>
+<div class="highlight-box"><strong>📌 En Google específicamente:</strong> Los analistas usan <strong>BigQuery</strong> para SQL, <strong>Looker Studio</strong> para dashboards y <strong>Colab</strong> para Python/R. El certificado Google DA te prepara para este stack exacto.</div>
+<div class="concept-card"><h3>📊 Tipos de análisis</h3><p><strong>Descriptivo</strong> — ¿Qué pasó? (métricas, KPIs)<br><strong>Diagnóstico</strong> — ¿Por qué pasó? (drill-down, correlaciones)<br><strong>Predictivo</strong> — ¿Qué pasará? (forecasting)<br><strong>Prescriptivo</strong> — ¿Qué debemos hacer? (recomendaciones)</p></div>
+</div>
+<div class="tab-pane" id="tab-practice">
+<div class="challenge-banner"><div class="challenge-icon">💼</div><div class="challenge-text"><h3>ESCENARIO DE TRABAJO REAL</h3><p>Acabas de unirte a un equipo de datos en una empresa de e-commerce. Tu manager te pide tu primer análisis.</p></div></div>
+<div class="task-card" id="task-card-t1"><div class="task-header" onclick="toggleTask('t1')"><span class="task-num">TAREA 01</span><span class="task-title">Define el problema correctamente</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t1">
+<div class="task-scenario"><strong>📨 EMAIL DE TU MANAGER</strong>"Hola, necesito que analices las ventas del Q4. El CEO quiere saber por qué bajaron las conversiones. Tienes acceso a Google Analytics y a nuestra DB de transacciones. Dame algo para el viernes."</div>
+<div class="task-question">Antes de hacer cualquier análisis, debes definir bien el problema. ¿Qué preguntas harías a tu manager para aclarar el scope? ¿Qué métricas necesitas? Escribe al menos 4 preguntas clave y justifica por qué son importantes.</div>
+<textarea class="code-input" id="input-t1" placeholder="1. ¿Cuál es el período de comparación exacto? (¿Q4 vs Q3? ¿Q4 2024 vs Q4 2023?)&#10;2. ¿Qué define 'conversión' en nuestro contexto?&#10;..."></textarea>
+
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t1','Define preguntas para aclarar análisis de ventas Q4: bajaron conversiones. Debe definir scope, métricas y preguntas al stakeholder.')">🚀 Enviar para revisión</button><button class="btn btn-ghost" onclick="document.getElementById('input-t1').value=''">Limpiar</button></div>
+<div id="feedback-t1" style="display:none"></div></div></div>
+<div class="task-card" id="task-card-t2"><div class="task-header" onclick="toggleTask('t2')"><span class="task-num">TAREA 02</span><span class="task-title">Identifica fuentes de datos</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t2">
+<div class="task-scenario"><strong>📊 CONTEXTO</strong>Tienes acceso a: Google Analytics (tráfico web), base de datos SQL de transacciones, CRM de clientes, y datos de Google Ads. Tu análisis es sobre la caída de conversiones en Q4.</div>
+<div class="task-question">Describe qué datos tomarías de cada fuente y cómo los combinarías. ¿Qué es datos primarios vs secundarios aquí? ¿Qué problemas de calidad de datos podrías anticipar?</div>
+<textarea class="code-input" id="input-t2" placeholder="Google Analytics: tomaría...&#10;Base de datos SQL: tomaría...&#10;CRM: tomaría...&#10;Google Ads: tomaría...&#10;&#10;Problemas que anticipo: ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t2','Identifica fuentes de datos para análisis de conversiones: GA, SQL DB transacciones, CRM, Google Ads. Explica primarios vs secundarios y problemas de calidad.')">🚀 Enviar para revisión</button></div>
+<div id="feedback-t2" style="display:none"></div></div></div>
+</div>
+<div class="tab-pane" id="tab-quiz">
+<div style="margin-bottom:20px"><div style="font-size:16px;font-weight:600;margin-bottom:6px">Quiz rápido — Conceptos clave</div><div style="font-size:13px;color:var(--text-muted)">Responde como si fuera una entrevista técnica</div></div>
+<div class="concept-card" style="margin-bottom:16px"><h3 style="font-size:14px;margin-bottom:12px">1. Un stakeholder pide "ver los datos de ventas". ¿Qué deberías hacer PRIMERO?</h3>
+<button class="quiz-option" data-id="q1" onclick="checkQuiz(this,false)"><span class="option-letter">A</span>Crear un dashboard inmediatamente en Tableau</button>
+<button class="quiz-option" data-id="q1" data-correct="true" onclick="checkQuiz(this,true)"><span class="option-letter">B</span>Hacer preguntas aclaratorias sobre qué decisión tomarán con los datos</button>
+<button class="quiz-option" data-id="q1" onclick="checkQuiz(this,false)"><span class="option-letter">C</span>Exportar toda la base de datos a Excel</button>
+<button class="quiz-option" data-id="q1" onclick="checkQuiz(this,false)"><span class="option-letter">D</span>Pedir acceso a todas las fuentes de datos disponibles</button></div>
+<div class="concept-card" style="margin-bottom:16px"><h3 style="font-size:14px;margin-bottom:12px">2. ¿Qué tipo de análisis es: "Las ventas bajaron porque el tráfico mobile cayó 40%"?</h3>
+<button class="quiz-option" data-id="q2" onclick="checkQuiz(this,false)"><span class="option-letter">A</span>Descriptivo</button>
+<button class="quiz-option" data-id="q2" data-correct="true" onclick="checkQuiz(this,true)"><span class="option-letter">B</span>Diagnóstico</button>
+<button class="quiz-option" data-id="q2" onclick="checkQuiz(this,false)"><span class="option-letter">C</span>Predictivo</button>
+<button class="quiz-option" data-id="q2" onclick="checkQuiz(this,false)"><span class="option-letter">D</span>Prescriptivo</button></div>
+</div>`;},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">MÓDULO 02 // DATA CLEANING</div><div class="lesson-title">Limpieza de Datos en el Trabajo Real</div><div class="lesson-subtitle">El 80% del tiempo de un analista se va en limpiar datos. Aprende a hacerlo como un profesional.</div></div>
+
+<div class="tabs"><button class="tab-btn active" onclick="switchTab(event,'c-theory')">📖 Teoría</button><button class="tab-btn" onclick="switchTab(event,'c-practice')">⚡ Práctica</button><button class="tab-btn" onclick="switchTab(event,'c-sql')">💻 SQL</button></div>
+<div class="tab-pane active" id="tab-c-theory">
+<div class="concept-card"><h3>🚩 Problemas más comunes en datos reales</h3><p><strong>Nulos / valores faltantes</strong> — ¿ignorar, imputar o eliminar?<br><strong>Duplicados</strong> — registros repetidos por errores de ingesta<br><strong>Formatos inconsistentes</strong> — "01/12/2024" vs "2024-12-01" vs "Dec 1 2024"<br><strong>Outliers</strong> — ¿error de datos o caso real?<br><strong>Tipos de datos incorrectos</strong> — precio guardado como string</p></div>
+<div class="highlight-box"><strong>⚡ Regla de oro en empresas:</strong> Siempre documenta tus decisiones de limpieza. Si eliminas registros, explica por qué. Tu análisis debe ser reproducible y auditable.</div>
+<div class="data-table-wrap"><table><thead><tr><th>user_id</th><th>email</th><th>purchase_date</th><th>amount</th><th>country</th></tr></thead><tbody>
+<tr><td>1001</td><td>ana@gmail.com</td><td>2024-01-15</td><td>$45.00</td><td>MX</td></tr>
+<tr style="color:var(--danger)"><td>1001</td><td>ana@gmail.com</td><td>2024-01-15</td><td>$45.00</td><td>MX</td></tr>
+<tr><td>1002</td><td>carlos@hotmail.com</td><td>15/01/2024</td><td>45</td><td>Mexico</td></tr>
+<tr style="color:var(--warn)"><td>1003</td><td>NULL</td><td>2024-01-16</td><td>-99</td><td>BR</td></tr>
+<tr style="color:var(--warn)"><td>1004</td><td>luis@</td><td>2024-01-17</td><td>$9999.00</td><td>co</td></tr>
+</tbody></table></div>
+<div style="font-size:12px;color:var(--text-muted);margin-top:8px">🔴 Duplicado &nbsp;🟡 Problemas de formato/calidad</div>
+</div>
+<div class="tab-pane" id="tab-c-practice">
+<div class="challenge-banner"><div class="challenge-icon">🔧</div><div class="challenge-text"><h3>SIMULACIÓN DE TRABAJO</h3><p>Eres Data Analyst en una fintech. Te entregan datos de transacciones con varios problemas. El equipo de ingeniería espera tu reporte de calidad.</p></div></div>
+<div class="task-card" id="task-card-t3"><div class="task-header" onclick="toggleTask('t3')"><span class="task-num">TAREA 03</span><span class="task-title">Auditoría de calidad de datos</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t3">
+<div class="task-scenario"><strong>📋 DATASET: transacciones_q4.csv (5,847 registros)</strong>Tu colega dice: "hay algo raro con los datos, los totales no cuadran con los reportes financieros".</div>
+<div class="task-question">Describe tu proceso de auditoría paso a paso. ¿Qué verificarías primero? ¿Qué funciones/queries usarías en SQL o Sheets? ¿Cómo documentarías los hallazgos?</div>
+<textarea class="code-input" id="input-t3" placeholder="Paso 1: Verificar el conteo total y comparar con la fuente...&#10;Paso 2: Buscar duplicados con...&#10;Paso 3: Revisar nulos en columnas clave..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t3','Proceso de auditoría de calidad en CSV de transacciones financieras donde los totales no cuadran. Debe incluir pasos concretos, queries o funciones, y documentación.')">🚀 Enviar para revisión</button></div>
+<div id="feedback-t3" style="display:none"></div></div></div>
+<div class="task-card" id="task-card-t4"><div class="task-header" onclick="toggleTask('t4')"><span class="task-num">TAREA 04</span><span class="task-title">¿Qué hacer con los valores nulos?</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t4">
+<div class="task-scenario"><strong>📊 SITUACIÓN</strong>customer_age: 340 nulos (5.8%). transaction_amount: 12 nulos. product_category: 890 nulos (15.2%).</div>
+<div class="task-question">Para cada caso decide: ¿eliminas registros, imputas un valor, o los dejas como nulos? Justifica considerando el impacto en el análisis.</div>
+<textarea class="code-input" id="input-t4" placeholder="customer_age (5.8% nulos): ...&#10;&#10;transaction_amount (12 nulos): ...&#10;&#10;product_category (15.2% nulos): ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t4','Decisión sobre nulos: customer_age 5.8%, transaction_amount 12 registros, product_category 15.2%. Justificar si elimina, imputa o mantiene nulos.')">🚀 Enviar para revisión</button></div>
+<div id="feedback-t4" style="display:none"></div></div></div>
+</div>
+<div class="tab-pane" id="tab-c-sql">
+<div class="code-block"><div class="code-header"><span class="code-lang">SQL — DETECTAR DUPLICADOS</span></div>
+<div class="code-body"><span class="cm">-- Encuentra registros duplicados</span>
+<span class="kw">SELECT</span> user_id, email, purchase_date, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> duplicates
+<span class="kw">FROM</span> transactions
+<span class="kw">GROUP BY</span> user_id, email, purchase_date
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) > <span class="nm">1</span>
+<span class="kw">ORDER BY</span> duplicates <span class="kw">DESC</span>;</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">SQL — AUDITAR NULOS</span></div>
+<div class="code-body"><span class="kw">SELECT</span>
+  <span class="fn">COUNT</span>(*) <span class="kw">AS</span> total_rows,
+  <span class="fn">COUNTIF</span>(email <span class="kw">IS NULL</span>) <span class="kw">AS</span> null_email,
+  <span class="fn">COUNTIF</span>(amount <span class="kw">IS NULL</span>) <span class="kw">AS</span> null_amount,
+  <span class="fn">ROUND</span>(<span class="fn">COUNTIF</span>(email <span class="kw">IS NULL</span>) * <span class="nm">100.0</span> / <span class="fn">COUNT</span>(*), <span class="nm">2</span>) <span class="kw">AS</span> pct_null_email
+<span class="kw">FROM</span> transactions;</div></div>
+<div class="task-card" id="task-card-t5"><div class="task-header" onclick="toggleTask('t5')"><span class="task-num">TAREA 05</span><span class="task-title">Escribe la query de limpieza</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t5">
+<div class="task-question">Escribe una query SQL que elimine duplicados de la tabla <code>transactions</code> manteniendo solo el registro más reciente (<code>created_at</code>) para cada <code>user_id</code> + <code>purchase_date</code>.</div>
+<textarea class="code-input" id="input-t5" placeholder="WITH ranked AS (&#10;  SELECT *,&#10;    ROW_NUMBER() OVER (&#10;      PARTITION BY ...&#10;      ORDER BY ...&#10;    ) AS rn&#10;  FROM transactions&#10;)&#10;SELECT * FROM ranked WHERE ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t5','Query SQL para eliminar duplicados en tabla transactions manteniendo solo registro más reciente por user_id + purchase_date usando created_at.')">🚀 Evaluar SQL</button></div>
+<div id="feedback-t5" style="display:none"></div></div></div>
+</div>`;},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">MÓDULO 03 // SQL</div><div class="lesson-title">SQL Queries como Analista</div><div class="lesson-subtitle">SQL es la herramienta #1 del data analyst. Practica con escenarios reales de negocio.</div></div>
+
+<div class="tabs"><button class="tab-btn active" onclick="switchTab(event,'s-joins')">🔗 JOINs</button><button class="tab-btn" onclick="switchTab(event,'s-agg')">📊 Agregaciones</button><button class="tab-btn" onclick="switchTab(event,'s-window')">🪟 Window Fn</button></div>
+<div class="tab-pane active" id="tab-s-joins">
+<div class="concept-card"><h3>🔗 JOINs — Lo que REALMENTE se usa</h3><p>En entornos reales el 90% de las queries involucran JOINs entre múltiples tablas. La clave es entender la cardinalidad y detectar multiplicación de registros.</p></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">CASO REAL: ANÁLISIS DE RETENCIÓN</span></div>
+<div class="code-body"><span class="cm">-- Clientes que compraron en Q3 pero NO en Q4</span>
+<span class="kw">SELECT</span> c.customer_id, c.email, c.segment,
+  <span class="fn">MAX</span>(q3.purchase_date) <span class="kw">AS</span> last_q3_purchase,
+  <span class="fn">SUM</span>(q3.amount) <span class="kw">AS</span> q3_total
+<span class="kw">FROM</span> customers c
+<span class="kw">INNER JOIN</span> orders q3 <span class="kw">ON</span> c.customer_id = q3.customer_id
+  <span class="kw">AND</span> q3.purchase_date <span class="kw">BETWEEN</span> <span class="st">'2024-07-01'</span> <span class="kw">AND</span> <span class="st">'2024-09-30'</span>
+<span class="kw">LEFT JOIN</span> orders q4 <span class="kw">ON</span> c.customer_id = q4.customer_id
+  <span class="kw">AND</span> q4.purchase_date <span class="kw">BETWEEN</span> <span class="st">'2024-10-01'</span> <span class="kw">AND</span> <span class="st">'2024-12-31'</span>
+<span class="kw">WHERE</span> q4.customer_id <span class="kw">IS NULL</span>
+<span class="kw">GROUP BY</span> <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>;</div></div>
+<div class="task-card" id="task-card-t6"><div class="task-header" onclick="toggleTask('t6')"><span class="task-num">TAREA 06</span><span class="task-title">Query de análisis de cohorte</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t6">
+<div class="task-scenario"><strong>📋 TABLAS</strong><code>users</code> (user_id, signup_date, country) | <code>orders</code> (order_id, user_id, amount, created_at)</div>
+<div class="task-question">El equipo de producto necesita: "¿Cuál es el revenue promedio por usuario en sus primeros 30 días, segmentado por país?" Escribe la query SQL.</div>
+<textarea class="code-input" id="input-t6" placeholder="SELECT&#10;  u.country,&#10;  COUNT(DISTINCT u.user_id) AS users,&#10;  ...&#10;FROM users u&#10;LEFT JOIN orders o ON ...&#10;WHERE ...&#10;GROUP BY ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t6','Query SQL para calcular revenue promedio por usuario en primeros 30 días segmentado por país. Tablas: users(user_id,signup_date,country), orders(order_id,user_id,amount,created_at).')">🚀 Evaluar SQL</button></div>
+<div id="feedback-t6" style="display:none"></div></div></div>
+</div>
+<div class="tab-pane" id="tab-s-agg">
+<div class="task-card" id="task-card-t7"><div class="task-header" onclick="toggleTask('t7')"><span class="task-num">TAREA 07</span><span class="task-title">Dashboard de métricas de negocio</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t7">
+<div class="task-scenario"><strong>📊 PETICIÓN DEL CEO</strong>"Necesito un resumen ejecutivo de ventas Q4 2024: total de revenue, número de órdenes, ticket promedio, y las top 5 categorías por revenue."</div>
+<div class="task-question">Escribe las queries SQL necesarias. Considera qué resultado presentarías primero y cómo.</div>
+<textarea class="code-input" id="input-t7" style="min-height:140px" placeholder="-- Métricas generales Q4&#10;SELECT ...&#10;&#10;-- Top 5 categorías&#10;SELECT ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t7','Queries SQL para resumen ejecutivo Q4: total revenue, número de órdenes, ticket promedio, top 5 categorías por revenue. Tablas: orders(order_id,user_id,amount,created_at,product_id), products(product_id,category).')">🚀 Evaluar SQL</button></div>
+<div id="feedback-t7" style="display:none"></div></div></div>
+</div>
+<div class="tab-pane" id="tab-s-window">
+<div class="concept-card"><h3>🪟 Window Functions — Nivel Senior</h3><p>Las window functions separan a un analista junior de uno senior. Permiten cálculos sobre particiones sin colapsar filas.</p></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">RANKING Y RUNNING TOTAL</span></div>
+<div class="code-body"><span class="fn">RANK</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> category <span class="kw">ORDER BY</span> monthly_revenue <span class="kw">DESC</span>) <span class="kw">AS</span> rank_in_category,
+<span class="fn">SUM</span>(monthly_revenue) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month_date <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>) <span class="kw">AS</span> running_total,
+<span class="fn">LAG</span>(revenue, <span class="nm">1</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month_date) <span class="kw">AS</span> prev_month</div></div>
+<div class="task-card" id="task-card-t8"><div class="task-header" onclick="toggleTask('t8')"><span class="task-num">TAREA 08</span><span class="task-title">Window function para MoM growth</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t8">
+<div class="task-question">Escribe una query que calcule el crecimiento Month-over-Month (MoM%) de revenue para cada categoría. Muestra: categoría, mes, revenue actual, revenue mes anterior, y % de cambio.</div>
+<textarea class="code-input" id="input-t8" placeholder="WITH monthly AS (&#10;  SELECT category, DATE_TRUNC(created_at, MONTH) AS month, SUM(amount) AS revenue&#10;  FROM orders o JOIN products p ON o.product_id = p.product_id&#10;  GROUP BY 1, 2&#10;)&#10;SELECT&#10;  category, month, revenue,&#10;  LAG(revenue) OVER (...) AS prev_month_revenue,&#10;  ...&#10;FROM monthly;"></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t8','Window function SQL para MoM growth por categoría: categoría, mes, revenue actual, revenue mes anterior, % de cambio usando LAG().')">🚀 Evaluar SQL</button></div>
+<div id="feedback-t8" style="display:none"></div></div></div>
+</div>`;},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">MÓDULO 04 // VISUALIZACIÓN</div><div class="lesson-title">Comunicar datos como un pro</div><div class="lesson-subtitle">Los mejores analistas no solo encuentran insights — los comunican de forma que generan acción.</div></div>
+
+<div class="concept-card"><h3>📐 Principios de visualización efectiva</h3><p><strong>Ratio señal/ruido</strong> — elimina todo lo que no añade información<br><strong>Preattentive attributes</strong> — color, tamaño, posición guían el ojo<br><strong>El gráfico correcto</strong> — línea para tendencias, barra para comparación, scatter para correlación<br><strong>El título es el insight</strong> — "Ventas Q4" ❌ vs "Ventas Q4 cayeron 23% por mobile" ✅</p></div>
+<div class="task-card" id="task-card-t9"><div class="task-header" onclick="toggleTask('t9')"><span class="task-num">TAREA 09</span><span class="task-title">Diseña un dashboard ejecutivo</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t9">
+<div class="task-scenario"><strong>📊 REUNIÓN CON EL VP EN 30 MINUTOS</strong>El VP de Producto pide un dashboard en Looker Studio. No sabe de datos pero tomará decisiones de presupuesto con lo que le muestres.</div>
+<div class="task-question">Describe qué 4-5 visualizaciones incluirías, qué gráfico usarías para cada una y por qué. ¿Qué destacarías visualmente? ¿Qué dejarías fuera?</div>
+<textarea class="code-input" id="input-t9" placeholder="Viz 1: [tipo gráfico] — [qué muestra] — [por qué este gráfico]&#10;Viz 2: ...&#10;...&#10;&#10;Lo que dejaría fuera: ...&#10;Insight principal a destacar: ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t9','Diseño de dashboard ejecutivo Q4 para VP no técnico en Looker Studio. 4-5 visualizaciones para decisiones de presupuesto. Justificar tipo de gráfico y qué incluir/excluir.')">🚀 Enviar para revisión</button></div>
+<div id="feedback-t9" style="display:none"></div></div></div>
+<div class="task-card" id="task-card-t10"><div class="task-header" onclick="toggleTask('t10')"><span class="task-num">TAREA 10</span><span class="task-title">Storytelling con datos</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t10">
+<div class="task-scenario"><strong>📈 DATOS QUE TIENES</strong>Conversiones: -23% MoM. Tráfico mobile: -40%. Desktop: +5%. Ticket promedio: +12%. Abandono de carrito mobile: +18%.</div>
+<div class="task-question">Escribe el párrafo ejecutivo (máx. 150 palabras) que enviarías por email al equipo directivo. ¿Qué pasó, por qué, y qué recomiendas? Para alguien no técnico.</div>
+<textarea class="code-input" id="input-t10" placeholder="Asunto: Análisis de conversiones Q4 — Hallazgos y recomendaciones&#10;&#10;Resumen ejecutivo:&#10;..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t10','Storytelling ejecutivo: conversiones -23%, mobile -40%, desktop +5%, ticket +12%, abandono carrito mobile +18%. Máx 150 palabras para directivos no técnicos.')">🚀 Enviar para revisión</button></div>
+<div id="feedback-t10" style="display:none"></div></div></div>`;},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag" style="background:rgba(239,68,68,0.1);color:#f87171;border-color:rgba(239,68,68,0.3)">RETO FINAL // CASO DE NEGOCIO</div><div class="lesson-title">Simulación: Tu Primera Semana como DA</div><div class="lesson-subtitle">Un caso completo de análisis de principio a fin. Igual a lo que harías en tu primera semana real de trabajo.</div></div>
+
+<div class="highlight-box" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.05)"><strong style="color:#f87171">🎯 CONTEXTO</strong><br>Eres Data Analyst Junior en una startup de e-commerce latinoamericana. La empresa creció 300% en 2023 pero en Q4 2024 el crecimiento se detuvo. El CEO quiere entender qué pasó. Tienes BigQuery con 18 meses de datos.</div>
+<div class="task-card" id="task-card-t11"><div class="task-header" onclick="toggleTask('t11')"><span class="task-num">RETO 01</span><span class="task-title">Define el plan de análisis completo</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t11">
+<div class="task-question">Crea tu plan de análisis antes de abrir BigQuery. Incluye: hipótesis que investigarás, métricas a medir, segmentaciones y estructura del reporte final. Como si fuera un documento de trabajo real.</div>
+<textarea class="code-input" id="input-t11" style="min-height:160px" placeholder="PLAN DE ANÁLISIS&#10;Objetivo: ...&#10;&#10;HIPÓTESIS PRINCIPALES:&#10;1. ...&#10;2. ...&#10;&#10;MÉTRICAS A ANALIZAR:&#10;- ...&#10;&#10;SEGMENTACIONES:&#10;- ...&#10;&#10;ENTREGABLES:&#10;- ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t11','Plan de análisis completo para investigar caída de crecimiento en startup ecommerce Q4 2024. Debe incluir hipótesis, métricas, segmentaciones y estructura de reporte como documento de trabajo real.')">🚀 Revisar plan</button></div>
+<div id="feedback-t11" style="display:none"></div></div></div>
+<div class="task-card" id="task-card-t12"><div class="task-header" onclick="toggleTask('t12')"><span class="task-num">RETO 02</span><span class="task-title">Presenta tus findings al CEO</span><span class="task-status">▸</span></div>
+<div class="task-body" id="task-body-t12">
+<div class="task-scenario"><strong>📊 DATOS DE BIGQUERY</strong>GMV Q4: $2.1M (-31% vs Q3). Merchants activos: 1,847 (-12%). Nuevos merchants: 234 (-45% vs Q4 2023). Churn rate: 8.3% (vs 4.1% Q3). Categoría más afectada: Moda (-52%). Región: México (-38%).</div>
+<div class="task-question">Escribe tu presentación ejecutiva al CEO en formato bullet points de negocio: 3 hallazgos principales, causa raíz probable, y 2-3 recomendaciones priorizadas.</div>
+<textarea class="code-input" id="input-t12" style="min-height:180px" placeholder="📊 Q4 2024 — Business Review&#10;&#10;SITUACIÓN: ...&#10;&#10;3 HALLAZGOS CLAVE:&#10;1. ...&#10;2. ...&#10;3. ...&#10;&#10;CAUSA RAÍZ PROBABLE: ...&#10;&#10;RECOMENDACIONES:&#10;1. [ALTA PRIORIDAD] ...&#10;2. [MEDIA PRIORIDAD] ..."></textarea>
+<div class="submit-row"><button class="btn btn-primary" onclick="submitTask('t12','Presentación ejecutiva al CEO sobre caída Q4: GMV -31%, merchants -12%, nuevos -45%, churn 8.3%, moda -52%, México -38%. Hallazgos, causa raíz y recomendaciones priorizadas.')">🚀 Presentar al CEO</button></div>
+<div id="feedback-t12" style="display:none"></div></div></div>`;},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">HERRAMIENTA // TUTOR IA</div><div class="lesson-title">Tutor Personal de Data Analytics</div><div class="lesson-subtitle">Hazle cualquier pregunta sobre el curso, SQL, análisis de datos o el certificado de Google.</div></div>
+
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+<div style="padding:16px 20px;border-bottom:1px solid var(--border);background:rgba(0,212,255,0.04);display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green)"></div><span style="font-family:var(--mono);font-size:12px;color:var(--accent)">TUTOR IA — ONLINE</span></div>
+<div id="chat-body" style="height:380px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:4px"><div style="margin-bottom:12px"><div style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 16px;border-radius:10px 10px 10px 2px;display:inline-block;font-size:13.5px;max-width:85%;line-height:1.6">¡Hola! Soy tu tutor de Data Analytics. Puedo ayudarte con SQL, limpieza de datos, visualización, el certificado Google DA, o cualquier duda sobre los ejercicios. ¿Qué necesitas aprender hoy? 🎯</div></div></div>
+<div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px">
+<input type="text" id="chat-input" placeholder="Pregunta algo... (ej: ¿cuándo usar LEFT JOIN vs INNER JOIN?)" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:13.5px;outline:none" onkeydown="if(event.key==='Enter'){var v=this.value.trim();if(v){sendChat(v);this.value='';}}" >
+<button class="btn btn-primary" onclick="var inp=document.getElementById('chat-input');var v=inp.value.trim();if(v){sendChat(v);inp.value='';}">Enviar</button>
+</div></div>
+<div style="margin-top:20px"><div style="font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:1px;margin-bottom:12px">PREGUNTAS FRECUENTES</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">`+['¿Qué es un LEFT JOIN?','¿GROUP BY vs WINDOW FUNCTIONS?','Tipos de análisis de datos','¿Cómo prepararme para el examen Google DA?','¿Qué es sesgo en datos?','¿Diferencia entre mean y median?'].map(function(q){return '<button onclick="sendChat(\''+q+'\');document.getElementById(\'chat-input\').value=\'\'" style="background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:7px 14px;border-radius:20px;cursor:pointer;font-size:12.5px;font-family:var(--sans);transition:all 0.2s" onmouseover="this.style.color=\'var(--text)\'" onmouseout="this.style.color=\'var(--text-muted)\'">'+q+'</button>';}).join('')+'</div></div>';},
+
+function(){return `<div class="lesson-header"><div class="lesson-tag">HERRAMIENTA // REFERENCIA</div><div class="lesson-title">SQL Cheat Sheet — Analista de Datos</div><div class="lesson-subtitle">Las queries más usadas en trabajo real. Úsala como referencia rápida.</div></div>
+
+<div class="code-block"><div class="code-header"><span class="code-lang">ESTRUCTURA BÁSICA</span></div>
+<div class="code-body"><span class="kw">SELECT</span> col1, col2, <span class="fn">AGG_FN</span>(col3)
+<span class="kw">FROM</span> table1
+<span class="kw">JOIN</span> table2 <span class="kw">ON</span> table1.id = table2.id
+<span class="kw">WHERE</span> condition
+<span class="kw">GROUP BY</span> col1, col2
+<span class="kw">HAVING</span> <span class="fn">AGG_FN</span>(col3) > value
+<span class="kw">ORDER BY</span> col1 <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> <span class="nm">100</span>;</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">WINDOW FUNCTIONS ESENCIALES</span></div>
+<div class="code-body"><span class="cm">-- Ranking</span>
+<span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> cat <span class="kw">ORDER BY</span> val <span class="kw">DESC</span>)
+<span class="fn">RANK</span>() <span class="kw">OVER</span> (...)   <span class="cm">-- empates tienen mismo rank</span>
+<span class="fn">DENSE_RANK</span>() <span class="kw">OVER</span> (...)  <span class="cm">-- sin saltos en ranking</span>
+<span class="fn">LAG</span>(value, <span class="nm">1</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> date)   <span class="cm">-- valor anterior</span>
+<span class="fn">LEAD</span>(value, <span class="nm">1</span>) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> date)  <span class="cm">-- valor siguiente</span>
+<span class="fn">SUM</span>(val) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> date <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>)</div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">DATE FUNCTIONS (BigQuery)</span></div>
+<div class="code-body"><span class="fn">DATE_TRUNC</span>(date_col, <span class="kw">MONTH</span>)         <span class="cm">-- truncar a mes</span>
+<span class="fn">DATE_DIFF</span>(date1, date2, <span class="kw">DAY</span>)         <span class="cm">-- diferencia en días</span>
+<span class="fn">DATE_ADD</span>(date_col, <span class="kw">INTERVAL</span> <span class="nm">7</span> <span class="kw">DAY</span>)   <span class="cm">-- sumar días</span>
+<span class="fn">FORMAT_DATE</span>(<span class="st">'%Y-%m'</span>, date_col)        <span class="cm">-- formatear</span>
+<span class="fn">EXTRACT</span>(<span class="kw">YEAR FROM</span> timestamp_col)      <span class="cm">-- extraer año</span></div></div>
+<div class="code-block"><div class="code-header"><span class="code-lang">PATRONES COMUNES</span></div>
+<div class="code-body"><span class="cm">-- MoM Growth %</span>
+<span class="fn">ROUND</span>((<span class="fn">SUM</span>(rev) - <span class="fn">LAG</span>(<span class="fn">SUM</span>(rev)) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month)) * <span class="nm">100.0</span>
+  / <span class="fn">NULLIF</span>(<span class="fn">LAG</span>(<span class="fn">SUM</span>(rev)) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month), <span class="nm">0</span>), <span class="nm">2</span>)
+
+<span class="cm">– % del total</span>
+<span class="fn">SUM</span>(val) * <span class="nm">100.0</span> / <span class="fn">SUM</span>(<span class="fn">SUM</span>(val)) <span class="kw">OVER</span> ()
+
+<span class="cm">– De-duplicar manteniendo más reciente</span>
+<span class="kw">WITH</span> cte <span class="kw">AS</span> (
+<span class="kw">SELECT</span> *, <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span> (<span class="kw">PARTITION BY</span> id <span class="kw">ORDER BY</span> updated_at <span class="kw">DESC</span>) rn
+<span class="kw">FROM</span> tbl)
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> cte <span class="kw">WHERE</span> rn = <span class="nm">1</span></div></div>`;}
+];
+
+function loadModule(idx){
+state.currentModule=idx;
+document.querySelectorAll(’.module-btn’).forEach(function(b,i){b.classList.toggle(‘active’,i===idx);});
+document.getElementById(‘main-content’).innerHTML=modules[idx]();
+}
+
+loadModule(0);
+</script>
+
+</body>
+</html>
